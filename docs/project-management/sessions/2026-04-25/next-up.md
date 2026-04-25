@@ -79,3 +79,12 @@ Meanwhile, in parallel: You review the 7 repo docs at your pace and drop your no
 bits into S2/S3.
 
 Want to start with /project-status (#2)? It's the perfect test case — we have real milestones and issues to run it against right now. 🐕
+
+---
+### Session Wrap: session-workflow-crystallization (18:33)
+- **Done:** Crystallized daily session folder structure (YYYY-MM-DD/ + next-up.md hub), created /setup-scaffold meta-command, updated session-start/end/README/init-project.sh/CLAUDE.md template
+- **Issues:** #16 opened and closed (daily session folders + setup-scaffold)
+- **Next:** Dhawal to review 7 repo docs, then begin finalizing S1 commands one by one
+
+## Sessions
+- [research-deep-dive](research-deep-dive.md) — COMPLETE
