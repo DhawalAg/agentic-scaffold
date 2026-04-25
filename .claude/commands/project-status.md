@@ -6,50 +6,123 @@ description: Project health dashboard — milestones, issues, recent activity
 
 Quick overview without leaving the terminal.
 
-## Step 1: Milestones
+## Step 1: Detect Repo
 
 ```bash
-gh milestone list --json title,number,openIssues,closedIssues,dueOn 2>/dev/null
+REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null)
 ```
 
-Calculate % complete for each.
+If `gh` is unavailable or unauthenticated, skip GitHub sections and show
+git-only status (Step 3 only).
 
-## Step 2: Recent Activity
+## Step 2: Milestones
+
+NOTE: `gh milestone list` does not exist. Use the API:
+
+```bash
+gh api "repos/$REPO/milestones" --jq '.[] | {title, open: .open_issues, closed: .closed_issues, due: .due_on}' 2>/dev/null
+```
+
+For each milestone, calculate:
+- total = open + closed
+- pct = (closed / total * 100), or 0 if total is 0
+- bar = render █ and ░ proportionally (10 chars wide)
+
+## Step 3: Recent Commits
 
 ```bash
 git log --oneline -10 --format="%h %s (%cr)"
 ```
 
-## Step 3: Open Issues
+## Step 4: Open Issues
 
 ```bash
-gh issue list --state open --json number,title,labels,milestone --limit 20 2>/dev/null
+gh issue list --state open --json number,title,labels,milestone --jq '
+  sort_by(.number) | .[] | {
+    number,
+    title,
+    labels: [.labels[].name],
+    milestone: (.milestone.title // "unassigned")
+  }' 2>/dev/null
 ```
 
-Group by milestone.
+Group issues by milestone. Within each group, sort priority:high first.
 
-## Step 4: Render
+## Step 5: Summary Counts
+
+```bash
+gh issue list --state all --json state,labels --jq '{
+  open: [.[] | select(.state == "OPEN")] | length,
+  closed: [.[] | select(.state == "CLOSED")] | length,
+  bugs: [.[] | select(.labels[].name == "type:bug")] | length
+}' 2>/dev/null
+```
+
+## Step 6: Today's Context
+
+Check for today's next-up.md:
+
+```bash
+TODAY=$(date +%Y-%m-%d)
+NEXTUP="docs/project-management/sessions/$TODAY/next-up.md"
+test -f "$NEXTUP" && echo "exists"
+```
+
+If it exists, read the **Focus** section (first few lines after `## Focus`).
+
+## Step 7: Render
 
 ```
 📊 PROJECT STATUS
-═══════════════════════════════════════
+═══════════════════════════════════════════════
 
-Milestones:
-  A1: Foundation        ████████░░ 80%  (8/10)
-  A2: Next Phase        ░░░░░░░░░░  0%  (0/6)
+📅 Today: YYYY-MM-DD
+🎯 Focus: [from next-up.md Focus section, or "No focus set — run /session-start"]
 
-🔥 Priority:
-  #12 [description]     [priority:high  size:medium]
-  #15 [description]     [priority:high  size:large]
+━━━ Milestones ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  S1: Review & Finalize  ████████░░  80%  (8/10)
+  S2: New Commands        ░░░░░░░░░░   0%  (0/3)
+  S3: Hooks & Infra       ██░░░░░░░░  20%  (1/5)
 
-📋 Open: N  |  ✅ Closed: N  |  🐛 Bugs: N
+━━━ Priority ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔥 #6  Finalize /todo workflow  [priority:high, size:large]  (S1)
+  🔥 #4  Finalize /session-start  [priority:high, size:medium] (S1)
+     #9  Finalize /milestone-progress  [priority:medium]       (S1)
 
-📝 Recent (7d):
-  hash feat: description (Nd ago)
+  🔥 #10 Implement /work command  [priority:high]  (S2)
+  🔥 #11 Implement /ship command  [priority:high]  (S2)
+     #12 Implement /reflect       [priority:medium] (S2)
 
-💡 Suggestion: Start with #N (priority:high)
+━━━ Totals ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📋 Open: N  |  ✅ Closed: N  |  🐛 Bugs: N
+
+━━━ Recent ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3137a1c docs: update next-up.md (3 min ago)
+  02711f9 feat: daily session folders (3 min ago)
+  f42fdff docs: add workflow-skeleton (28 min ago)
+
+💡 Suggested next: #N — [title] (priority:high, size:small)
 ```
 
-If no milestones/issues exist:
-"No issues yet. Use `/create-issue` to add tasks,
-or run `scripts/setup-github-labels.sh` to set up labels first."
+## Suggestion Logic
+
+Pick the next task by this priority:
+1. priority:high + size:small in the earliest milestone (quick win)
+2. priority:high in the earliest milestone
+3. Any open issue in the earliest milestone
+
+## Empty State
+
+If no milestones or issues exist:
+
+```
+📊 PROJECT STATUS
+═══════════════════════════════════════════════
+
+No milestones or issues yet.
+
+Get started:
+  1. bash scripts/setup-github-labels.sh
+  2. /create-issue to add your first task
+  3. Create milestones via GitHub or gh CLI
+```
