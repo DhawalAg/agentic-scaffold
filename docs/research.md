@@ -23,7 +23,9 @@ Prevents accidental side effects.
 **Extracted into scaffold:** Issue creation, label system design.
 
 ### 2. mitsuhiko/agent-stuff (Armin Ronacher)
-**What they have:** 19 skills in `skills/`, minimal AGENTS.md
+**What they have:** 19 skills + 16 TypeScript extensions for [Pi Coding Agent](https://buildwithpi.ai/)
+
+**Skills (markdown-based, agent-agnostic):**
 - `commit/SKILL.md` — Conventional commits. Smart about file selection:
   "if unclear, ask the user which files to commit." Checks recent log for
   common scopes.
@@ -32,14 +34,87 @@ Prevents accidental side effects.
 - `librarian/SKILL.md` — 🔥 Caches remote repos in `~/.cache/checkouts/`.
   Partial clone (`--filter=blob:none`), throttled refresh (5min),
   fast-forward when clean. Genius for reference work.
-- Also: tmux, uv, web-browser, mermaid, Google Workspace, OpenSCAD, Sentry
+- Also: tmux, uv, web-browser, mermaid, Google Workspace, Sentry, OpenSCAD,
+  apple-mail, native-web-search, summarize (via `uvx markitdown`)
 
-**Key pattern:** Skills are standalone markdown files with a shell helper script
-when needed (`checkout.sh`). AGENTS.md is tiny — just release workflow.
-Proves that less is more for project-level instructions.
+**Extensions (TypeScript, Pi-specific — the REAL gold):**
 
-**Extracted into scaffold:** Commit convention, gh CLI patterns.
-**Future:** Librarian pattern for cross-project reference.
+Pi Coding Agent (`@mariozechner/pi-coding-agent`) has a programmatic extension
+API with hooks: `before_agent_start`, `tool_call`, `tool_result`, `agent_end`,
+`session_start`, `session_switch`, `session_before_compact`. Extensions can:
+- Register commands (`pi.registerCommand()`)
+- Register tools the LLM can call (`pi.registerTool()`)
+- Block tool calls with a reason
+- Inject messages into conversation (`pi.sendMessage()`)
+- Render custom TUI components (`ctx.ui.custom()`)
+- Branch/fork sessions (`ctx.navigateTree()`)
+- Persist state across turns (`pi.appendEntry()`)
+
+Key extensions:
+
+- **`loop.ts`** — 🔥🔥 Autonomous coding loop with breakout conditions.
+  Three modes: `tests` (keep going until tests pass), `self` (agent decides
+  when done), `custom` (user-defined breakout). Registers a `signal_loop_success`
+  tool the LLM can call to break out. Persists state across sessions.
+  Handles context compaction. Detects aborted turns and asks to break.
+
+- **`review.ts`** — 🔥🔥 Code review in a session branch:
+  - Branches conversation to do isolated review
+  - Structured handoff with P0-P3 priority findings
+  - Three end modes: return only, return+summarize, return+fix
+  - Review summary prompt is incredibly thorough:
+    - Scope, Verdict, Findings (with file:line), Fix Queue, Constraints
+    - Non-blocking human callouts: "adds DB migration", "new dependency",
+      "changes auth/permissions", "backwards-incompatible", "irreversible ops"
+  - Auto-generates fix queue and can auto-apply fixes in priority order
+
+- **`todos.ts`** — Full TUI todo manager with file-backed storage.
+  Actions: refine, work, view, copy path/text, release, delete, close, reopen.
+  Uses overlays and interactive selection. Can trigger agent to "work on"
+  or "refine" a todo by injecting it as the next prompt.
+
+- **`context.ts`** — Shows loaded context: AGENTS.md files, extensions,
+  skills (highlighted green if actually loaded this session), token usage
+  bar (system|tools|convo|remaining), session cost. Tracks skill loading
+  by watching `read` tool calls — if a file inside a skill dir is read,
+  that skill is marked as "loaded".
+
+- **`session-breakdown.ts`** — 7/30/90-day usage analytics TUI.
+  Shows sessions/messages/tokens by model, by directory, by day-of-week,
+  by time-of-day. Unicode bar charts. Tabbed views with keyboard navigation.
+
+- **`split-fork.ts`** — Fork current session into a new terminal split
+  (Ghostty-specific via AppleScript). Forked session carries full conversation
+  history. Enables parallel work on related tasks.
+
+- **`go-to-bed.ts`** — 😂 After midnight (00:00-05:59), blocks tool execution
+  and tells you to go to sleep. Agent pushes back with "caring firmness".
+  User must explicitly confirm via `echo confirm-that-we-continue-after-midnight`.
+  Confirmation lasts for the night only.
+
+- **`multi-edit.ts`** — Replaces built-in edit with batch edits + Codex-style
+  patch support. Includes preflight validation.
+
+- **`notify.ts`** — Desktop notifications when agent finishes.
+
+- **`prompt-editor.ts`** — Mode selector: switch between model/thinking configs.
+  Persists selection. History support.
+
+**Architecture insights:**
+- **Event-driven hooks** — Pre/post agent start, tool call/result interception
+- **Tool blocking** — Extensions can block any tool call with a reason string
+- **Session branching** — Navigate tree, do isolated work, return with summary
+- **Distributions** — `mitsupi-common` (default set) and `mitsupi-loaded` (extras)
+  Published on npm for Pi's package loader.
+- **Intercepted commands** — Wraps python/pip/poetry for safety/customization
+
+**Key pattern:** Skills are agent-agnostic markdown. Extensions are Pi-specific
+TypeScript. The split is intentional — skills port anywhere, extensions need
+the framework.
+
+**Extracted into scaffold:** Commit convention, gh CLI patterns, skill architecture.
+**Future:** Loop concept (simplified), review workflow, context visibility,
+librarian for cross-project reference.
 
 ### 3. coleam00/link-in-bio-page-builder
 **What they have:** 7 commands, 2 skills, `.agents/plans/`
@@ -130,6 +205,9 @@ plus `ai_docs/` and `specs/`
 | `plan-feature` → `.agents/plans/` | coleam00 | Needs a real feature to test |
 | `allowed-tools` frontmatter | anthropic | Needs Claude Code support |
 | Tiered issue detail | EveryInc | Currently overkill for solo dev |
+| Loop (run until tests pass) | mitsuhiko | Powerful but needs guardrails |
+| Review branch workflow | mitsuhiko | Needs session branching support |
+| Context visibility command | mitsuhiko | Shows token budget + loaded skills |
 
 ### Tier 3 — Future
 | Pattern | Source | Why wait |
@@ -139,6 +217,10 @@ plus `ai_docs/` and `specs/`
 | Orphan task detection | badlogic | Needs worktrees |
 | Issue dedup (parallel agents) | anthropic | Needs volume of issues |
 | Issue triage automation | anthropic | Needs CI/GitHub Actions |
+| Session forking (parallel) | mitsuhiko | Needs Pi or equivalent runtime |
+| Usage analytics dashboard | mitsuhiko | Needs session data format |
+| Tool call blocking (safety) | mitsuhiko | Needs extension API support |
+| Go-to-bed guard | mitsuhiko | Fun, needs extension hooks |
 
 ---
 
