@@ -1,0 +1,83 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code when working in this repository.
+
+## Project Overview
+
+<!-- What is this? One paragraph. -->
+
+{PROJECT_NAME} — {one-line description of what this project does and why}.
+
+## Quick Reference
+
+| Resource | Path |
+|----------|------|
+| Config | `{config_path}` |
+| Output | `{output_path}` |
+| Tests | `{test_path}` |
+
+## Commands
+
+```bash
+# Development
+{dev_command}
+
+# Test
+{test_command}
+
+# Build (if applicable)
+{build_command}
+```
+
+## Project Structure
+
+```
+{project_name}/
+├── src/           # {description}
+├── tests/         # {description}
+└── docs/          # {description}
+```
+
+## Conventions
+
+- **Language:** {language}
+- **Style:** {formatter/linter}
+- **Naming:** {conventions}
+- **Error handling:** {approach}
+
+## Workflows
+
+<!-- Project-specific slash commands. Delete rows you don't use. -->
+
+| Command | Purpose | Output |
+|---------|---------|--------|
+| `/{command}` | {what it does} | {where output goes} |
+
+## Project Management
+
+- **Vision:** `docs/project-management/01-vision.md`
+- **Roadmap:** `docs/project-management/05-roadmap.md`
+- **Session logs:** `docs/project-management/sessions/`
+- **GitHub:** Issues + Milestones (`gh issue list`)
+
+### PM Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/session-start` | Load context, pick a task, create branch |
+| `/session-end` | Log progress, save handoff notes |
+| `/project-status` | Dashboard of milestones and issues |
+| `/create-issue` | Quick issue creation with labels |
+| `/todo` | Full workflow: select → implement → commit |
+| `/milestone-progress` | Deep dive on a specific milestone |
+
+### Commit Convention
+
+Conventional commits with issue references:
+- `feat: add parser (#12)`
+- `fix: handle edge case, closes #15`
+- `docs:`, `refactor:`, `test:`, `chore:`
+
+### Branch Convention
+
+`<issue-number>-short-description` (e.g., `12-csv-parser`)
