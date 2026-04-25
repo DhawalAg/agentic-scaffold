@@ -57,19 +57,20 @@ This file provides guidance to Claude Code when working in this repository.
 
 - **Vision:** `docs/project-management/01-vision.md`
 - **Roadmap:** `docs/project-management/05-roadmap.md`
-- **Session logs:** `docs/project-management/sessions/`
+- **Daily hub:** `docs/project-management/sessions/YYYY-MM-DD/next-up.md`
 - **GitHub:** Issues + Milestones (`gh issue list`)
 
 ### PM Commands
 
 | Command | Purpose |
 |---------|---------|
-| `/session-start` | Load context, pick a task, create branch |
-| `/session-end` | Log progress, save handoff notes |
+| `/session-start` | Create daily hub, load context, pick task |
+| `/session-end` | Log progress, update hub, handoff notes |
 | `/project-status` | Dashboard of milestones and issues |
 | `/create-issue` | Quick issue creation with labels |
 | `/todo` | Full workflow: select → implement → commit |
 | `/milestone-progress` | Deep dive on a specific milestone |
+| `/setup-scaffold` | Bootstrap scaffold into a new project |
 
 ### Commit Convention
 

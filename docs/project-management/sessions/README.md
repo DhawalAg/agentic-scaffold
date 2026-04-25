@@ -1,15 +1,63 @@
 # Session Logs
 
-One file per coding session. Format: `YYYY-MM-DD-descriptor.md`.
+Daily folder structure with a hub file and individual workstream sessions.
 
-Async handoff notes between sessions. `/session-start` reads the latest.
+```
+sessions/
+  YYYY-MM-DD/
+    next-up.md              ← Daily hub: focus, active issues, scratch pad
+    research-deep-dive.md   ← Individual workstream session
+    refactor-auth.md        ← Another session same day
+  YYYY-MM-DD/
+    next-up.md
+    ...
+```
 
-## Format
+## How It Works
+
+### next-up.md — The Daily Cockpit
+
+Created by `/session-start` on the first session of each day.
+Agent reads it for context and appends status updates. Never rewrites your content.
+
+Two key sections:
+- **Active Issues** — auto-populated from `gh issue list`. GitHub is the source of truth.
+- **Scratch Pad** — temporary notes, ideas, quick thoughts. If something survives 2+ days, promote it to a GitHub issue.
+
+Cross-day handoff: Active Issues refresh from GitHub (always current). Scratch Pad
+items carry over from yesterday's next-up.md.
+
+### Session Files — Workstream Logs
+
+One per workstream/exploration. Named by descriptor only (date is in the folder).
+Created by `/session-start` when you begin a specific piece of work.
+
+## next-up.md Template
 
 ```markdown
-# Session: YYYY-MM-DD — Short Description
+# Next Up — YYYY-MM-DD
 
-**Status:** COMPLETE | IN PROGRESS
+## Focus
+<!-- What's on your mind today. Free text. -->
+
+## Active Issues
+<!-- Auto-populated by /session-start from GitHub -->
+- [ ] #N title [labels]
+
+## Sessions
+<!-- Links to individual session files -->
+- [descriptor](descriptor.md) — STATUS
+
+## Scratch Pad
+<!-- Temporary notes. If it survives 2+ days, promote to issue. -->
+```
+
+## Session File Template
+
+```markdown
+# Session: Short Description
+
+**Status:** IN PROGRESS | COMPLETE
 **Goal:** What we set out to do
 
 ## Accomplished
@@ -28,34 +76,10 @@ Async handoff notes between sessions. `/session-start` reads the latest.
 - [ ] What to pick up next
 ```
 
-## Why Session Logs?
+## Why This Structure?
 
 - **Context is expensive.** Reloading takes tokens and time.
 - **Handoff > memory.** Written notes beat hoping the LLM remembers.
-- **Progress is visible.** Session logs are a commit-by-commit journal.
-
----
-
-## Session 001 — 2025-04-25 — Bootstrap
-
-**Status:** COMPLETE
-**Goal:** Create the agentic-scaffold project from research.
-
-### Accomplished
-- Researched 6 repos (anthropic, badlogic, mitsuhiko, coleam00, EveryInc, yzyydev)
-- Deep dive into mitsuhiko/agent-stuff Pi extensions (16 TypeScript extensions)
-  - Pi Coding Agent = full programmatic framework (not just markdown commands)
-  - Key patterns: loop (run-until-pass), review (branch→review→fix),
-    context visibility, session forking, go-to-bed guard, TUI todos
-- Created 6 slash commands, templates, label setup, init script
-- Committed initial scaffold (15 files, 917 lines)
-
-### Key Decision
-Skills (markdown) are portable across agents. Extensions (TypeScript) are
-framework-specific. Our scaffold uses markdown commands (Claude Code / Code Puppy
-compatible) but documents the programmatic patterns for future growth.
-
-### Next Time
-- [ ] Apply scaffold to second-brain or finance-hub as first real test
-- [ ] Try the loop concept as a simplified slash command
-- [ ] Build review summary prompt into a /review command
+- **next-up.md is your cockpit.** One glance tells you where you are.
+- **Session files are workstream journals.** Dig in when you need detail.
+- **GitHub Issues are truth.** next-up.md references them, never duplicates.

@@ -1,10 +1,10 @@
 ---
-description: End a coding session — log progress, create handoff notes
+description: End a coding session — log progress, update daily hub, handoff
 ---
 
 # Session End
 
-Save progress and write a handoff note for next time.
+Save progress and write handoff notes.
 
 ## Step 1: Gather Data
 
@@ -20,33 +20,38 @@ gh issue list --state closed --json number,title,closedAt --jq '.[] | select(.cl
 2. **Any blockers?**
 3. **What should you do next time?**
 
-## Step 3: Write Session Log
+## Step 3: Update Session File
 
-Create `docs/project-management/sessions/YYYY-MM-DD-descriptor.md`:
+Find the current session file in `docs/project-management/sessions/YYYY-MM-DD/`.
+(The most recently created file that isn't `next-up.md`.)
+
+Update it:
+- **Status:** → COMPLETE
+- **Accomplished:** from commits + user input
+- **Issues Touched:** from gh issue activity
+- **Commits:** from git log
+- **Blockers / Notes:** from user input
+- **Next Time:** from user input
+
+## Step 4: Append to next-up.md
+
+Append a summary block to today's `next-up.md`. Never rewrite existing content.
 
 ```markdown
-# Session: YYYY-MM-DD — [Descriptor]
 
-**Status:** COMPLETE
-**Goal:** [inferred from work]
-
-## Accomplished
-- [from commits + user input]
-
-## Issues Touched
-- #N: title (opened | closed | progressed)
-
-## Commits
-- hash type: description
-
-## Blockers / Notes
-- [user input or "None"]
-
-## Next Time
-- [ ] [user input]
+---
+### Session Wrap: <descriptor> (HH:MM)
+- **Done:** [1-2 line summary]
+- **Issues:** #N closed, #M progressed
+- **Next:** [first "next time" item]
 ```
 
-## Step 4: Commit Check
+Update the Sessions section link status:
+```
+- [descriptor](descriptor.md) — COMPLETE
+```
+
+## Step 5: Commit Check
 
 ```bash
 git status
@@ -54,16 +59,19 @@ git status
 
 If uncommitted changes: "Commit remaining changes before ending?"
 
-Commit the session log itself:
+Commit session files:
 ```bash
 git add docs/project-management/sessions/
-git commit -m "docs: session log for YYYY-MM-DD"
+git commit -m "docs: session log — <descriptor>"
 ```
 
-## Step 5: Sign Off
+## Step 6: Sign Off
 
 ```
 🔴 SESSION ENDED
-Log: docs/project-management/sessions/YYYY-MM-DD-descriptor.md
+━━━━━━━━━━━━━━━━━━━━━━━━━
+Session: <descriptor>
+Log: docs/project-management/sessions/YYYY-MM-DD/<descriptor>.md
+Hub: docs/project-management/sessions/YYYY-MM-DD/next-up.md
 Next: [first "next time" item]
 ```
