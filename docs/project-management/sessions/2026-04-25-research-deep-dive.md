@@ -276,16 +276,19 @@ We deployed GitHub search across 5 query vectors and analyzed **25+ repos** in t
 - [ ] **DECIDE** which patterns to adopt / reject / defer
 
 ### For Code Puppy (next session):
+- [ ] **Collate Dhawal's review notes** from `docs/research/reviews/01-07` into implementation specs for each adopted pattern
+- [ ] Finalize each existing command (session-start, session-end, project-status, create-issue, todo, milestone-progress) — one by one, commit each
 - [ ] Implement `/work` and `/ship` commands (already designed in workflow-skeleton.md)
 - [ ] Implement `/reflect` command (post-task learning capture)
 - [ ] Add post-compact reminder hook (if Dhawal approves)
 - [ ] Consider merging `/prime` logic into `/session-start` (richer context loading)
 - [ ] Update research.md with new repo findings
+- [ ] Create GitHub issues for each skill to finalize (eat our own dog food!)
 
 ---
 
 ## Issues Touched
-- None (research session, no code changes)
+- None yet — setting up GitHub remote + issues next
 
 ## Commits
 - `docs: add research deep-dive session doc`
