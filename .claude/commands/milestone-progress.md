@@ -8,14 +8,23 @@ $ARGUMENTS — Milestone title or number (e.g., "A1" or "1"). Blank = show all.
 
 ## Get Data
 
-If argument provided:
+If argument provided, read from local `.issues/` (synced at `/session-start`):
+```bash
+# Search local issues by milestone
+gh-issue-sync list --all --search "milestone:$ARGUMENTS" 2>/dev/null
+```
+
+Or parse front matter from `.issues/open/*.md` and `.issues/closed/*.md` where
+`milestone:` matches the argument.
+
+Fallback if gh-issue-sync is not installed:
 ```bash
 gh issue list --milestone "$ARGUMENTS" --state all --json number,title,state,labels 2>/dev/null
 ```
 
-If blank:
+If blank (show all milestones — gh-issue-sync doesn't cover milestone metadata):
 ```bash
-gh milestone list --json title,number,openIssues,closedIssues 2>/dev/null
+gh api "repos/$REPO/milestones" --jq '.[] | {title, open: .open_issues, closed: .closed_issues}' 2>/dev/null
 ```
 
 ## Render

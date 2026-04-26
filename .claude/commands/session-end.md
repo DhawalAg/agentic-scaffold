@@ -11,6 +11,17 @@ Save progress and write handoff notes.
 ```bash
 git log --oneline --since="6 hours ago" 2>/dev/null || git log --oneline -5
 git diff --stat HEAD 2>/dev/null
+```
+
+Check for issues closed today (local-first):
+```bash
+# Check local closed issues
+ls .issues/closed/ 2>/dev/null | head -20
+gh-issue-sync status 2>/dev/null
+```
+
+Fallback if gh-issue-sync is not installed:
+```bash
 gh issue list --state closed --json number,title,closedAt --jq '.[] | select(.closedAt > "'"$(date -u +%Y-%m-%dT00:00:00Z)"'")' 2>/dev/null || true
 ```
 
@@ -64,6 +75,17 @@ Commit session files:
 git add docs/project-management/sessions/
 git commit -m "docs: session log — <descriptor>"
 ```
+
+## Step 5.5: Sync Issues to GitHub
+
+Batch-push all local changes (new issues, closes, edits) back to GitHub:
+
+```bash
+gh-issue-sync push 2>/dev/null
+```
+
+Print sync results. If gh-issue-sync is not installed, skip this step
+(issues were already managed via `gh` CLI directly).
 
 ## Step 6: Sign Off
 

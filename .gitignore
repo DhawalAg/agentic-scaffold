@@ -6,3 +6,6 @@ __pycache__/
 .DS_Store
 dist/
 build/
+
+# Local issue sync (per-machine state)
+.issues/

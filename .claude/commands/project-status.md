@@ -36,6 +36,15 @@ git log --oneline -10 --format="%h %s (%cr)"
 
 ## Step 4: Open Issues
 
+Read from local `.issues/` directory (synced at `/session-start`):
+
+```bash
+gh-issue-sync list 2>/dev/null
+```
+
+Or parse `.issues/open/*.md` front matter directly for richer grouping.
+
+Fallback if gh-issue-sync is not installed:
 ```bash
 gh issue list --state open --json number,title,labels,milestone --jq '
   sort_by(.number) | .[] | {
@@ -50,6 +59,19 @@ Group issues by milestone. Within each group, sort priority:high first.
 
 ## Step 5: Summary Counts
 
+Count from local `.issues/` directory:
+- **Open:** count files in `.issues/open/`
+- **Closed:** count files in `.issues/closed/` (if synced with `--all`)
+- **Bugs:** grep for `type:bug` in front matter of `.issues/open/*.md`
+
+```bash
+# Quick local counts
+OPEN=$(ls .issues/open/*.md 2>/dev/null | wc -l | tr -d ' ')
+CLOSED=$(ls .issues/closed/*.md 2>/dev/null | wc -l | tr -d ' ')
+BUGS=$(grep -l 'type:bug' .issues/open/*.md 2>/dev/null | wc -l | tr -d ' ')
+```
+
+Fallback if `.issues/` doesn't exist:
 ```bash
 gh issue list --state all --json state,labels --jq '{
   open: [.[] | select(.state == "OPEN")] | length,

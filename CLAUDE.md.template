@@ -58,7 +58,13 @@ This file provides guidance to Claude Code when working in this repository.
 - **Vision:** `docs/project-management/01-vision.md`
 - **Roadmap:** `docs/project-management/05-roadmap.md`
 - **Daily hub:** `docs/project-management/sessions/YYYY-MM-DD/next-up.md`
-- **GitHub:** Issues + Milestones (`gh issue list`)
+- **Issues:** Local `.issues/` directory (synced via `gh-issue-sync`)
+- **GitHub:** Issues + Milestones (synced at `/session-start`, pushed at `/session-end`)
+
+### Tools
+
+- **gh-issue-sync** — Local-first issue management. Issues live in `.issues/open/` and `.issues/closed/` as Markdown with YAML front matter. Synced at session boundaries.
+- **gh CLI** — Fallback for direct GitHub API calls (milestones, PRs).
 
 ### PM Commands
 

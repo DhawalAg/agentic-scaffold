@@ -103,7 +103,8 @@ dist/
 build/
 __pycache__/
 .DS_Store
-Thumbs.db"
+Thumbs.db
+.issues/"
 
 if [ ! -f "$TARGET_DIR/.gitignore" ]; then
   echo "$GITIGNORE_ENTRIES" > "$TARGET_DIR/.gitignore"
@@ -122,6 +123,18 @@ else
   else
     echo "⏭️  .gitignore already has all standard entries"
   fi
+fi
+
+# --- gh-issue-sync ---
+if command -v gh-issue-sync &>/dev/null; then
+  cd "$TARGET_DIR"
+  gh-issue-sync init 2>/dev/null && echo "✅ Initialized gh-issue-sync (.issues/)"
+  gh-issue-sync pull 2>/dev/null && echo "✅ Pulled issues from GitHub"
+  gh-issue-sync write-skill --agent claude --scope project 2>/dev/null && echo "✅ Installed gh-issue-sync Claude skill"
+else
+  echo "⏭️  gh-issue-sync not found. Install later:"
+  echo "   curl -sSfL https://github.com/mitsuhiko/gh-issue-sync/releases/latest/download/install.sh | sh"
+  echo "   gh-issue-sync init && gh-issue-sync pull"
 fi
 
 echo ""

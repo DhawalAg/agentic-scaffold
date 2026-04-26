@@ -23,6 +23,11 @@ git status
 4. Show open issues:
 
 ```bash
+gh-issue-sync list 2>/dev/null
+```
+
+Fallback if gh-issue-sync is not installed:
+```bash
 gh issue list --state open --json number,title,labels,milestone --limit 15 2>/dev/null
 ```
 
@@ -32,8 +37,14 @@ If no issues: "No issues found. Use `/create-issue` to add tasks first."
 
 1. Present numbered list grouped by milestone
 2. ⏸️ STOP → "Which issue? (number)"
-3. Read the full issue:
+3. Read the full issue from local files:
 
+```bash
+# Read from .issues/open/<number>-*.md
+cat .issues/open/<number>-*.md 2>/dev/null
+```
+
+Fallback if file not found:
 ```bash
 gh issue view <number>
 ```
@@ -67,6 +78,12 @@ git checkout -b <number>-short-description
    - Ask if issue should be closed
 
 3. Close if done:
+   ```bash
+   gh-issue-sync close <number>
+   ```
+   The close is staged locally and pushed at `/session-end`.
+
+   Fallback if gh-issue-sync is not installed:
    ```bash
    gh issue close <number> --comment "Completed in branch <branch>"
    ```

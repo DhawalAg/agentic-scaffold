@@ -17,6 +17,10 @@ get a working session lifecycle, issue tracking, and commit workflow out of the 
   milestone-progress.md        # Deep dive on one milestone
   setup-scaffold.md            # Bootstrap scaffold into any project
 
+.issues/                       # Local issue sync (auto-generated, gitignored)
+  open/                        # Open issues as Markdown + YAML front matter
+  closed/                      # Closed issues (when synced with --all)
+
 docs/project-management/       # Project planning docs (customize these)
   01-vision.template.md        # Why the project exists
   05-roadmap.template.md       # Milestone-linked roadmap
@@ -59,24 +63,32 @@ bash /path/to/agentic-scaffold/scripts/init-project.sh
 cp -r /path/to/agentic-scaffold/.claude/commands/ .claude/commands/
 ```
 
-### Then: Set up GitHub
+### Then: Set up GitHub + issue sync
 ```bash
 bash scripts/setup-github-labels.sh
+# Install gh-issue-sync for local-first issue management
+curl -sSfL https://github.com/mitsuhiko/gh-issue-sync/releases/latest/download/install.sh | sh
+gh-issue-sync init && gh-issue-sync pull
 ```
 
 ## The Daily Loop
 
 ```
-/session-start             ← create daily hub, pick a task
+/session-start             ← sync issues, create daily hub, pick a task
   ↓
   code, code, code...
   commit: "feat: X (#12)"
   ↓
-  /create-issue            ← capture ideas inline
-  /project-status          ← check progress
+  /create-issue            ← capture ideas inline (local until push)
+  /project-status          ← check progress (reads local .issues/)
   ↓
-/session-end               ← log progress, update hub
+/session-end               ← log progress, push issues to GitHub
 ```
+
+Issues are managed **local-first** via [`gh-issue-sync`](https://github.com/mitsuhiko/gh-issue-sync):
+- `/session-start` runs `gh-issue-sync pull` (single network sync)
+- `/create-issue` and `/todo` work against local `.issues/` files
+- `/session-end` runs `gh-issue-sync push` (batch sync to GitHub)
 
 ## Session Structure
 
@@ -102,10 +114,11 @@ sessions/
 
 1. **Minimal.** 7 commands, 10 labels, 3 template files. That's it.
 2. **Portable.** Nothing project-specific in the commands. Works anywhere.
-3. **Git-native.** GitHub Issues + Milestones. No external tools.
-4. **Session-oriented.** Context is expensive. Written handoffs > memory.
-5. **Inside-out.** Learn the workflow by using it, not by reading about it.
-6. **Your cockpit.** next-up.md is yours. The agent helps, never hijacks.
+3. **Local-first.** Issues synced to `.issues/` via gh-issue-sync. No network calls mid-session.
+4. **Git-native.** GitHub Issues + Milestones. No external tools beyond gh-issue-sync.
+5. **Session-oriented.** Context is expensive. Written handoffs > memory.
+6. **Inside-out.** Learn the workflow by using it, not by reading about it.
+7. **Your cockpit.** next-up.md is yours. The agent helps, never hijacks.
 
 ## Research
 

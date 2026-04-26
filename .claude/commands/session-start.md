@@ -23,7 +23,14 @@ Check if `docs/project-management/sessions/YYYY-MM-DD/next-up.md` exists.
 1. Check if yesterday's next-up.md exists. If so, read its **Scratch Pad** section
    to carry over unfinished items.
 
-2. Fetch active issues from GitHub:
+2. Sync and fetch active issues (local-first):
+   ```bash
+   # Sync once at session start — this is the single network call
+   gh-issue-sync pull 2>/dev/null
+   # Read from local .issues/ directory
+   gh-issue-sync list 2>/dev/null
+   ```
+   Fallback if gh-issue-sync is not installed:
    ```bash
    gh issue list --state open --limit 15 --json number,title,labels,milestone 2>/dev/null
    ```

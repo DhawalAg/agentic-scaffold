@@ -141,6 +141,25 @@ bash scripts/setup-github-labels.sh
 
 If `gh` not available: "⏭️ Skipping labels (gh CLI not found). Run later: bash scripts/setup-github-labels.sh"
 
+## Step 9.5: Initialize gh-issue-sync
+
+If `gh-issue-sync` is available:
+
+```bash
+gh-issue-sync init 2>/dev/null
+gh-issue-sync pull 2>/dev/null
+gh-issue-sync write-skill --agent claude --scope project 2>/dev/null
+```
+
+Print: "✅ gh-issue-sync initialized — local issues in .issues/"
+
+If not installed:
+```
+⏭️ Skipping gh-issue-sync (not found). Install later:
+   curl -sSfL https://github.com/mitsuhiko/gh-issue-sync/releases/latest/download/install.sh | sh
+   gh-issue-sync init && gh-issue-sync pull
+```
+
 ## Step 10: First Day Folder
 
 Create today's session folder and next-up.md:

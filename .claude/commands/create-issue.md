@@ -39,6 +39,21 @@ Create? (y/n)
 
 ## Step 4: Create
 
+Create the issue locally with gh-issue-sync (stays local until next `gh-issue-sync push`):
+
+```bash
+gh-issue-sync new "<title>" \
+  --label "type:<type>" --label "priority:<priority>" --label "size:<size>"
+```
+
+Then edit the created file (in `.issues/open/T*-<slug>.md`) to:
+- Add the body content below the front matter
+- Set `milestone: <milestone>` in the front matter
+
+Print: "✅ Created local issue: <filename>"
+Print: "💡 This issue is local-only. It will be pushed to GitHub at `/session-end` or via `gh-issue-sync push`."
+
+Fallback if gh-issue-sync is not installed:
 ```bash
 gh issue create \
   --title "<title>" \
@@ -46,8 +61,6 @@ gh issue create \
   --label "type:<type>,priority:<priority>,size:<size>" \
   --milestone "<milestone>"
 ```
-
-Print: "✅ Created #N: title"
 
 ## Labels
 
